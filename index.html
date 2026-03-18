@@ -2,70 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FUTA CBT APP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Application</title>
     <style>
-        button {
-            touch-action: manipulation;
+        body {
+            font-family: Arial, sans-serif;
         }
-
-        button:active {
-            background-color: #ccc; /* Example of enhancing button active states */
-        }
-
-        .q-dot {
-            width: 16px; /* Increase size of q-dot on mobile */
-            height: 16px;
-        }
-
-        .modal {
-            pointer-events: none; /* Optimize modal pointer-events */
+        .interactive {
+            cursor: pointer;
+            user-select: none;
         }
     </style>
 </head>
 <body>
-    <button id="myButton">Click me!</button>
-    <div class="q-dot"></div>
+    <header>
+        <h1>Computer-Based Test Application</h1>
+    </header>
+    <main>
+        <div id="options" class="interactive">
+            <button data-index="0">Option A</button>
+            <button data-index="1">Option B</button>
+            <button data-index="2">Option C</button>
+            <button data-index="3">Option D</button>
+        </div>
+        <div id="questions">
+            <div class="question-dot interactive" data-index="0">1</div>
+            <div class="question-dot interactive" data-index="1">2</div>
+            <div class="question-dot interactive" data-index="2">3</div>
+        </div>
+    </main>
     <script>
-        // Debounce function for chooseOpt
-        function debounce(func, delay) {
-            let timeoutId;
-            return function(...args) {
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
+        // Centralized ExamState
+        const ExamState = {
+            currentQuestion: 0,
+            selectedOption: null,
+            setCurrentQuestion(index) {
+                this.currentQuestion = index;
+            },
+            selectOption(index) {
+                this.selectedOption = index;
+            }
+        };
+
+        // Event delegation for options
+        document.getElementById('options').addEventListener('click', function(e) {
+            if (e.target.matches('button')) {
+                const index = e.target.getAttribute('data-index');
+                ExamState.selectOption(index);
+                console.log(`Selected Option: ${index}`);
+            }
+        });
+
+        // Unsafe navigation guard
+        document.getElementById('questions').addEventListener('click', function(e) {
+            if (e.target.matches('.question-dot')) {
+                if (confirm('Are you sure you want to navigate to the next question?')) {
+                    const index = e.target.getAttribute('data-index');
+                    ExamState.setCurrentQuestion(index);
+                    console.log(`Navigated to Question: ${index}`);
                 }
-                timeoutId = setTimeout(() => {
-                    func.apply(this, args);
-                }, delay);
-            };
-        }
-
-        // Setting passive event listeners
-        window.addEventListener('scroll', function() {
-            // Optimization logic here
-        }, { passive: true });
-
-        // Auto-scroll inputs on focus
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', () => {
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
+            }
         });
-
-        // Disable iOS zoom on inputs
-        document.querySelectorAll('input').forEach(input => {
-            input.setAttribute('style', 'font-size: 16px;'); // Prevent zoom
-        });
-
-        // Reduce sidebar transition time
-        document.querySelector('.sidebar').style.transition = '0.2s'; // Example transition time
-
-        // Using requestAnimationFrame for timer updates
-        function updateTimer() {
-            // Timer update logic here
-            requestAnimationFrame(updateTimer);
-        }
-        requestAnimationFrame(updateTimer);
     </script>
 </body>
 </html>
